@@ -26,7 +26,7 @@ str(df)
 ```
 
 ## What is mean total number of steps taken per day?
-###  1. total number of steps taken per day
+###  1. Total number of steps taken per day
 
 Calculate the sum of the number of steps for each day with *aggregate* and show the first ten rows:
 ```{r message=FALSE, warning=FALSE, paged.print=TRUE}
@@ -37,7 +37,9 @@ print(head(df_sum), row.names = F)
 ### 2. Make a histogram of the total number of steps taken each day
 ```{r message=FALSE, warning=FALSE}
 a   <- ggplot(df_sum, aes(x))
-a   + geom_histogram(bins=35) + labs(title="Total number of steps per day", x="Steps per day", y="count")
+a   + geom_histogram(bins=35) + labs(title="Total number of steps per day",
+                                     x="Steps per day",
+                                     y="count")
 ```
 
 ###  3. Calculate and report the mean and median of the total number of steps taken per day
@@ -48,7 +50,8 @@ print(report,row.names = F)
 ```
 
 ## What is the average daily activity pattern?
-### 1. Make a time series plot (type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
+
+### 1. Make a time series plot of the 5-minute interval and the average number of steps taken, averaged across all days
 ```{r }
 interv_avg <- aggregate(df$steps, by=list(interval=df$interval), FUN=mean, na.rm=TRUE)
 plot(interv_avg$interval,
@@ -76,7 +79,7 @@ This is a great step-by-step manual to impute missing data: [mice](https://rstud
 print(sapply(df, function(x) sum(is.na(x))), row.names = F)
 ```
 
-### 2. filling in all of the missing values in the dataset
+### 2. Filling in all of the missing values in the dataset
 Load the "mice"-Package, show a table of missing values with the function **md.pattern**, then impute the missing values from *steps* with the **mice** function
 ```{r chache=TRUE}
 imputed_df <- mice(df, m=5, maxit = 50, method = 'pmm', seed = 500, print=FALSE) 
@@ -95,7 +98,7 @@ complete_df <- complete(imputed_df, 3)
 print(head(complete_df), row.names = FALSE)
 ```
 
-### 4. mean, median and new histogram with imputed values 
+### 4. Mean, median and new histogram with imputed values 
 ```{r }
 imputed_df_sum <- aggregate(complete_df$steps, by=list(date=complete_df$date), FUN=sum)
 report_imputed <- data.frame(mean_imp=mean(imputed_df_sum$x), 

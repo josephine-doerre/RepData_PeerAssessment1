@@ -39,7 +39,7 @@ str(df)
 ```
 
 ## What is mean total number of steps taken per day?
-###  1. total number of steps taken per day
+###  1. Total number of steps taken per day
 
 Calculate the sum of the number of steps for each day with *aggregate* and show the first ten rows:
 
@@ -62,7 +62,9 @@ print(head(df_sum), row.names = F)
 
 ```r
 a   <- ggplot(df_sum, aes(x))
-a   + geom_histogram(bins=35) + labs(title="Total number of steps per day", x="Steps per day", y="count")
+a   + geom_histogram(bins=35) + labs(title="Total number of steps per day",
+                                     x="Steps per day",
+                                     y="count")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
@@ -81,7 +83,8 @@ print(report,row.names = F)
 ```
 
 ## What is the average daily activity pattern?
-### 1. Make a time series plot (type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
+
+### 1. Make a time series plot of the 5-minute interval and the average number of steps taken, averaged across all days
 
 ```r
 interv_avg <- aggregate(df$steps, by=list(interval=df$interval), FUN=mean, na.rm=TRUE)
@@ -124,7 +127,7 @@ print(sapply(df, function(x) sum(is.na(x))), row.names = F)
 ##     2304        0        0
 ```
 
-### 2. filling in all of the missing values in the dataset
+### 2. Filling in all of the missing values in the dataset
 Load the "mice"-Package, show a table of missing values with the function **md.pattern**, then impute the missing values from *steps* with the **mice** function
 
 ```r
@@ -175,7 +178,7 @@ print(head(complete_df), row.names = FALSE)
 ##      0 2012-10-01       25
 ```
 
-### 4. mean, median and new histogram with imputed values 
+### 4. Mean, median and new histogram with imputed values 
 
 ```r
 imputed_df_sum <- aggregate(complete_df$steps, by=list(date=complete_df$date), FUN=sum)
@@ -199,11 +202,11 @@ print(report,row.names = F)
 ##  10766.19  10765
 ```
 
+Get the two dataframes together and plot both of them next to each other, to see differences. 
 
 ```r
 df1 <- df_sum
 df2 <- imputed_df_sum
-#Now, combine your two dataframes into one.  First make a new column in each.
 df1$type <- 'with NAs'
 df2$type <- 'with imputed'
 combine <- rbind(df1, df2)
@@ -217,3 +220,38 @@ labs(title="Total number of original and imputed steps per day",
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+### 1. Create a new factor variable in the dataset with two levels – “weekday” and “weekend” 
+
+
+```r
+complete_df <- mutate(complete_df, wd = as.factor(weekdays(date)))
+
+levels(complete_df$wd) <- list(weekday="Friday",
+                               weekday="Monday", 
+                               weekday="Thursday",
+                               weekday="Tuesday",
+                               weekday="Wednesday",
+                               weekend="Saturday",
+                               weekend="Sunday")
+```
+
+### 2. Time series plot of the 5-minute interval and the average number of steps taken, averaged across all weekday days or weekend days 
+
+
+```r
+complete_df_avg <- aggregate(complete_df$steps,
+                             by=list(interval=complete_df$interval, 
+                             day=complete_df$wd),
+                             FUN=mean)
+
+j   <- ggplot(complete_df_avg,
+              aes(interval, x))
+j   + geom_line() + facet_grid(day~.) + labs(title="Time series plot of the 5-minute interval",
+                                             x="5-minute interval", 
+                                             y="mean number of steps")
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
+
+
